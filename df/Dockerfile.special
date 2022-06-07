@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ./src .
+RUN dotnet publish \
+    -c Release                \
+    -p:PublishTrimmed=True    \
+    -p:TrimMode=Link          \
+    --runtime alpine-x64      \
+    --self-contained true     \
+    -o /app/publish
+
+
+FROM alpine:3 AS base
+RUN apk add --no-cache \ 
+    openssh libunwind \
+    nghttp2-libs libidn krb5-libs libuuid lttng-ust zlib \
+    libstdc++ libintl \
+    icu
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV DOTNET_EnableDiagnostics=0
+ENTRYPOINT ["/app/my-app"]

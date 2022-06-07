@@ -1,0 +1,14 @@
+# Start with the SDK
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+
+# Setup work-folder
+WORKDIR /app
+
+# Copy source
+COPY ./src ./
+
+# Publish/compile
+RUN dotnet publish  -c Release  -o out
+
+# How to run
+ENTRYPOINT ["out/my-app"]
