@@ -1,2 +1,5 @@
+.vscode
 Dockerfile
 tag.txt
+obj/
+bin/
