@@ -1,29 +1,33 @@
 TARGETS=$(shell ls df/Dockerfile.* | sed "s|.*/Dockerfile\.||")
-COPY=$(foreach X,$(TARGETS),copy/$(X))
 TAG=$(shell cat tag.txt)
+.PHONY: $(TARGETS)
 
 .SILENT: help
 help:
 	echo "Targets: $(TARGETS)"
 
 clean:
-	-rm Dockerfile tag.txt
-	-rm -rf src/bin src/obj
-	docker images my-app | grep my-app | awk '{print $$1 ":" $$2}' | xargs -r docker rmi
+	-rm Dockerfile tag.txt 2>/dev/null
+	-rm -rf src/bin src/obj 2>/dev/null
+	@bin/do docker images my-app | grep my-app | awk '{print $$1 ":" $$2}' | xargs -r docker rmi
 
-$(COPY):
+all:
+	echo -n $(TARGETS) | xargs -d' ' -I{} make {} docker
+	make images
+
+$(TARGETS):
 	@echo $(notdir $@) >tag.txt
-	cp df/Dockerfile.$(notdir $@) Dockerfile
+	@-rm Dockerfile 2>/dev/null
+	@bin/do ln -s df/Dockerfile.$(notdir $@) Dockerfile
 
 run-local:
-	dotnet run --project ./src
+	@bin/do dotnet run --project ./src
 
 docker:
-	docker build -t my-app:$(TAG) .
+	@bin/do docker build -t my-app:$(TAG) .
 
 images:
-	docker images my-app
-#	docker images my-app --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}'
+	@bin/do docker images my-app
 
 run:
-	docker run --rm my-app:$(TAG)
+	@bin/do docker run --rm my-app:$(TAG)

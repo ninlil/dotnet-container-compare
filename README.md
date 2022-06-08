@@ -11,11 +11,12 @@ Short examples of different Dockerfiles and compare methods and images-sizes
 | trim    | Trimmed and self-contained app                |
 | alpine  | Trimmed and self-contained app, target alpine |
 | special | Specialized build (for comparison)            |
+| go      | Static compile of Go example                  |
 
 ## Command-usage
 ```sh
 # Select a specific target
-make copy/1
+make 1
 ```
 
 ```sh
